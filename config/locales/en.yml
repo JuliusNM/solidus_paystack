@@ -1,0 +1,4 @@
+en:
+  activerecord:
+    models:
+      solidus_paystack/payment_method: Paystack

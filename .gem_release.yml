@@ -1,0 +1,5 @@
+bump:
+  recurse: false
+  file: 'lib/solidus_paystack/version.rb'
+  message: Bump SolidusPaystack to %{version}
+  tag: true
