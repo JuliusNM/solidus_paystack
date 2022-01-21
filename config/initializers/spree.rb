@@ -54,6 +54,7 @@ Spree.config do |config|
     'paystack_env_credentials',
     public_api_key: ENV['PAYSTACK_PUBLIC_KEY'],
     private_api_key: ENV['PAYSTACK_SECRET_KEY'],
+    currency: ENV['CURRENCY'],
     # server: Rails.env.production? ? 'production' : 'test',
     test_mode: !Rails.env.production?
   )

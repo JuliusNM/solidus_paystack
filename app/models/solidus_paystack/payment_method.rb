@@ -4,7 +4,7 @@ module SolidusPaystack
   class PaymentMethod < Spree::PaymentMethod
     preference :public_api_key, :string
     preference :private_api_key, :string
-    preference :javascript_url, :string
+    preference :currency, :string
 
     delegate :try_void, to: :gateway
 
