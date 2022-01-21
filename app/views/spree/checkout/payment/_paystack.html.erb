@@ -5,15 +5,11 @@
   class="hidden"
   data-paymentgateway='<%=SolidusPaystack::PaymentMethod.first.id%>'
   data-current_order_id='<%=current_order.id%>'
+  data-billing_email='<%=current_order.email%>'
   data-secret='<%=SolidusPaystack::PaymentMethod.first.preferred_public_api_key%>'
   data-order_total='<%=current_order.total %>'></div>
 
  <div id="paymentForm">
-  <div class="form-group">
-    <label for="email">Email Address</label>
-    <input type="email" id="email-address"  />
-  </div>
-
    <div class="form-submit">
     <button type="submit" onclick="payNowWithPaystack(event)"> Pay Now </button>
   </div>
