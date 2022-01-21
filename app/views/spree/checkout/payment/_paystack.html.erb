@@ -10,10 +10,4 @@
   data-currency='<%=SolidusPaystack::PaymentMethod.first.preferred_currency%>'
   data-order_total='<%=current_order.total %>'></div>
 
- <div id="paymentForm">
-   <div class="form-submit">
-    <button type="submit" onclick="payNowWithPaystack(event)"> Pay Now </button>
-  </div>
-</div>
-
 <script src="https://js.paystack.co/v1/inline.js"></script>
