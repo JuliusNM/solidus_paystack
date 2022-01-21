@@ -6,16 +6,18 @@
           const currentOrder = $("#paystack_checkout_payload").data("current_order_id");
           const orderTotal = $("#paystack_checkout_payload").data("order_total");
           const email = $("#paystack_checkout_payload").data("billing_email");
-          payWithPaystack(event, currentOrder, orderTotal, email);
+          const currency = $("#paystack_checkout_payload").data("currency");
+          payWithPaystack(event, currentOrder, orderTotal, email, currency);
       }
   }
 
-  function payWithPaystack(event, orderId, amount, email) {
+  function payWithPaystack(event, orderId, amount, email, currency) {
       event.preventDefault();
       const secret = $("#paystack_checkout_payload").data("secret");
       let handler = PaystackPop.setup({
         key: secret,
         email: email,
+        currency:currency,
         amount: amount * 100,
         ref: orderId,
         onClose: function(){

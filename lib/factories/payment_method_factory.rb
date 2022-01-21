@@ -5,6 +5,6 @@ FactoryBot.define do
     name { "Paystack" }
     preferred_public_api_key { "public000" }
     preferred_private_api_key { "private999" }
-    preferred_javascript_url { "" }
+    preferred_currency { "" }
   end
 end

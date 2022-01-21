@@ -7,6 +7,7 @@
   data-current_order_id='<%=current_order.id%>'
   data-billing_email='<%=current_order.email%>'
   data-secret='<%=SolidusPaystack::PaymentMethod.first.preferred_public_api_key%>'
+  data-currency='<%=SolidusPaystack::PaymentMethod.first.preferred_currency%>'
   data-order_total='<%=current_order.total %>'></div>
 
  <div id="paymentForm">
