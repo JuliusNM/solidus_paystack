@@ -5,16 +5,17 @@
       if (paystackPaymentMethodId.toString() === checkedPaymentMethod) {
           const currentOrder = $("#paystack_checkout_payload").data("current_order_id");
           const orderTotal = $("#paystack_checkout_payload").data("order_total");
-          payWithPaystack(event, currentOrder, orderTotal);
+          const email = $("#paystack_checkout_payload").data("billing_email");
+          payWithPaystack(event, currentOrder, orderTotal, email);
       }
   }
 
-  function payWithPaystack(event, orderId, amount) {
+  function payWithPaystack(event, orderId, amount, email) {
       event.preventDefault();
       const secret = $("#paystack_checkout_payload").data("secret");
       let handler = PaystackPop.setup({
         key: secret,
-        email: document.getElementById("email-address").value,
+        email: email,
         amount: amount * 100,
         ref: orderId,
         onClose: function(){
