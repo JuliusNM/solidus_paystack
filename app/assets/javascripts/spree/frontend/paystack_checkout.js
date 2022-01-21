@@ -14,11 +14,12 @@
   function payWithPaystack(event, orderId, amount, email, currency) {
       event.preventDefault();
       const secret = $("#paystack_checkout_payload").data("secret");
+      const amount_kobo = String(amount) * 100
       let handler = PaystackPop.setup({
         key: secret,
         email: email,
         currency:currency,
-        amount: amount * 100,
+        amount: amount_kobo,
         ref: orderId,
         onClose: function(){
             return false;
