@@ -1,8 +1,5 @@
 # Solidus Paystack
 
-[![CircleCI](https://circleci.com/gh/solidusio-contrib/solidus_paystack.svg?style=shield)](https://circleci.com/gh/solidusio-contrib/solidus_paystack)
-[![codecov](https://codecov.io/gh/solidusio-contrib/solidus_paystack/branch/master/graph/badge.svg)](https://codecov.io/gh/solidusio-contrib/solidus_paystack)
-
 <!-- Explain what your extension does. -->
 
 ## Installation
@@ -18,6 +15,20 @@ Bundle your dependencies and run the installation generator:
 ```shell
 bin/rails generate solidus_paystack:install
 ```
+
+### Paystack Configuration
+Navigate to admin/payment_methods/new.
+Paystack should now appear on the list of payment methods. 
+1. Set the Preference Source to custom
+2. Copy the private and public keys from the paystack dashboard and paste them on their respective fields.
+3. Set Auto Capture to true
+4. Set Currency code
+
+Lastly we need to set the callback url to enable paystack to update the order once processed.
+On the paystack dashboard, under https://dashboard.paystack.com/#/settings/developer, append
+ /paystack/confirm/  after your store HOST url. like so
+
+https://horrible-frog-27.loca.lt/paystack/confirm/
 
 ## Usage
 
@@ -88,4 +99,4 @@ Please refer to the dedicated [page](https://github.com/solidusio/solidus/wiki/H
 
 ## License
 
-Copyright (c) 2021 [name of extension author], released under the New BSD License.
+Copyright (c) 2021 [Julius Ngigi], released under the New BSD License.
