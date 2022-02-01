@@ -30,7 +30,7 @@ function payWithPaystack(event, orderId, amount, email, currency) {
         amount: amount_kobo,
         ref: orderId,
         onClose: function(){
-            return false;
+            location.reload();
         },
         callback: function() {
             $('#checkout_form_payment').submit();
