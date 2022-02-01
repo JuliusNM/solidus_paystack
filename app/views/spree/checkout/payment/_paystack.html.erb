@@ -4,7 +4,7 @@
   id="paystack_checkout_payload"
   class="hidden"
   data-paymentgateway='<%=SolidusPaystack::PaymentMethod.first.id%>'
-  data-current_order_id='<%=current_order.id%>'
+  data-current_order_id='<%=current_order.number%>'
   data-billing_email='<%=current_order.email%>'
   data-secret='<%=SolidusPaystack::PaymentMethod.first.preferred_public_api_key%>'
   data-currency='<%=SolidusPaystack::PaymentMethod.first.preferred_currency%>'
