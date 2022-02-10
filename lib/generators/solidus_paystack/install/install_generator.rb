@@ -6,10 +6,6 @@ module SolidusPaystack
       class_option :auto_run_migrations, type: :boolean, default: false
       source_root File.expand_path('templates', __dir__)
 
-      def copy_initializer
-        template 'initializer.rb', 'config/initializers/solidus_paystack.rb'
-      end
-
       def add_javascripts
         append_file 'vendor/assets/javascripts/spree/frontend/all.js', "//= require spree/frontend/solidus_paystack\n"
         append_file 'vendor/assets/javascripts/spree/backend/all.js', "//= require spree/backend/solidus_paystack\n"

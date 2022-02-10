@@ -8,6 +8,8 @@ module Spree
       def confirm
         case paystack_params["event"]
         when "charge.success"
+          # Await Solidus to complete transitioning order states
+          sleep 1.5
           transaction_ref = paystack_params["data"]["reference"]
           if valid_transaction?(transaction_ref)
             checkout_token = paystack_params["data"]["authorization"]["authorization_code"]
@@ -37,9 +39,13 @@ module Spree
                   )
                   order.payment_total = order.total
                   order.save!
+                  head :ok
                 end
               end
             end
+            head :ok
+          else
+            head :unauthorized
           end
         end
       end
