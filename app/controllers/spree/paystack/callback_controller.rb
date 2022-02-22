@@ -12,6 +12,7 @@ module Spree
           sleep 1.5
           transaction_ref = paystack_params["data"]["reference"]
           if valid_transaction?(transaction_ref)
+            transaction_ref = transaction_ref.partition('_').first
             checkout_token = paystack_params["data"]["authorization"]["authorization_code"]
 
             unless checkout_token
