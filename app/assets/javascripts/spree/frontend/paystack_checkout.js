@@ -16,7 +16,8 @@ function payNowWithPaystack(event){
     const orderTotal = $("#paystack_checkout_payload").data("order_total");
     const email = $("#paystack_checkout_payload").data("billing_email");
     const currency = $("#paystack_checkout_payload").data("currency");
-    payWithPaystack(event, currentOrder, orderTotal, email, currency);
+    const orderIdWithTimestamp = currentOrder + "_" + Date.now();
+    payWithPaystack(event, orderIdWithTimestamp, orderTotal, email, currency);
 }
 
 function payWithPaystack(event, orderId, amount, email, currency) {
