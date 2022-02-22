@@ -19,29 +19,12 @@ module Spree
             end
 
             order = Spree::Order.find_by(number: transaction_ref)
-            if order && order.payment_state == 'balance_due'
-              payment_method = SolidusPaystack::PaymentMethod.first
-
-              paystack_source_transaction = SolidusPaystack::Transaction.new(
-                transaction_id: paystack_params["data"]["id"],
-                checkout_token: checkout_token,
-                provider: 'paystack'
-              )
-
-              paystack_source_transaction.transaction do
-                if paystack_source_transaction.save!
-                  paystack_payment = order.payments.where(payment_method_id: payment_method.id).first
-                  paystack_payment&.update!(
-                    payment_method_id: payment_method.id,
-                    source: paystack_source_transaction,
-                    amount: order.total,
-                    state: 'completed'
-                  )
-                  order.payment_total = order.total
-                  order.save!
-                  head :ok
-                end
-              end
+            if order
+              order.reload
+              order.complete_order(order) unless order.complete?
+              process_order(order, checkout_token, paystack_params["data"]["id"])
+            else
+              head :not_found
             end
           else
             head :unauthorized
@@ -60,6 +43,36 @@ module Spree
       def valid_transaction?(ref)
         paystack = SolidusPaystack::PaymentMethod.first
         SolidusPaystack::Gateway.new({ private_api_key: paystack.preferred_private_api_key}).verify_transaction(ref)
+      end
+
+      def complete_order(order)
+        order.complete if order.can_complete?
+      end
+
+      def process_order(order, checkout_token, transaction_id)
+        if order.payment_state == 'balance_due'
+          payment_method = SolidusPaystack::PaymentMethod.first
+          paystack_source_transaction = SolidusPaystack::Transaction.new(
+            transaction_id: transaction_id,
+            checkout_token: checkout_token,
+            provider: 'paystack'
+          )
+
+          paystack_source_transaction.transaction do
+            if paystack_source_transaction.save!
+              paystack_payment = order.payments.where(payment_method_id: payment_method.id).first
+              paystack_payment&.update!(
+                payment_method_id: payment_method.id,
+                source: paystack_source_transaction,
+                amount: order.total,
+                state: 'completed'
+              )
+              order.payment_total = order.total
+              order.save!
+              head :ok
+            end
+          end
+        end
       end
 
       def paystack_params
