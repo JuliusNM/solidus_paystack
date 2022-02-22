@@ -22,7 +22,7 @@ module Spree
             if order
               order.reload
               order.complete_order(order) unless order.complete?
-              process_order(order)
+              process_order(order, checkout_token, paystack_params["data"]["id"])
             else
               head :not_found
             end
@@ -49,11 +49,11 @@ module Spree
         order.complete if order.can_complete?
       end
 
-      def process_order(order)
+      def process_order(order, checkout_token, transaction_id)
         if order.payment_state == 'balance_due'
           payment_method = SolidusPaystack::PaymentMethod.first
           paystack_source_transaction = SolidusPaystack::Transaction.new(
-            transaction_id: paystack_params["data"]["id"],
+            transaction_id: transaction_id,
             checkout_token: checkout_token,
             provider: 'paystack'
           )
