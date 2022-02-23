@@ -32,6 +32,8 @@ function payWithPaystack(event, orderId, amount, email, currency) {
         amount: amount_kobo_int,
         ref: orderId,
         onClose: function(){
+            const button = $('input[type="submit"][name="commit"]')
+            button.disabled = true
             location.reload();
         },
         callback: function() {
