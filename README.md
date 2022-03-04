@@ -1,4 +1,5 @@
 # Solidus Paystack
+[![JuliusNM](https://circleci.com/gh/JuliusNM/solidus_paystack.svg?style=svg)](https://app.circleci.com/pipelines/github/JuliusNM)
 
 <!-- Explain what your extension does. -->
 
