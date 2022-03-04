@@ -1,41 +1,26 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-orbs:
-  # Always take the latest version of the orb, this allows us to
-  # run specs against Solidus supported versions only without the need
-  # to change this configuration every time a Solidus version is released
-  # or goes EOL.
-  solidusio_extensions: solidusio/extensions@volatile
-
+# Define a job to be invoked later in a workflow.
+# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  run-specs-with-postgres:
-    executor: solidusio_extensions/postgres
+  say-hello:
+    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+    docker:
+      - image: cimg/base:stable
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
-      - solidusio_extensions/run-tests
-  run-specs-with-mysql:
-    executor: solidusio_extensions/mysql
-    steps:
-      - solidusio_extensions/run-tests
-  lint-code:
-    executor: solidusio_extensions/sqlite-memory
-    steps:
-      - solidusio_extensions/lint-code
+      - checkout
+      - run:
+          name: "Say hello"
+          command: "echo Hello, World!"
 
+# Invoke jobs via workflows
+# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  "Run specs on supported Solidus versions":
+  say-hello-workflow:
     jobs:
-      - run-specs-with-postgres
-      - run-specs-with-mysql
-      - lint-code
-
-  "Weekly run specs against master":
-    triggers:
-      - schedule:
-          cron: "0 0 * * 4" # every Thursday
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - run-specs-with-postgres
-      - run-specs-with-mysql
+      - say-hello
