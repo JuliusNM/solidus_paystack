@@ -22,7 +22,7 @@ module Spree
             order = Spree::Order.find_by(number: transaction_ref)
             if order
               order.reload
-              order.complete_order(order) unless order.complete?
+              complete_order(order) unless order.complete?
               process_order(order, checkout_token, paystack_params["data"]["id"])
             else
               head :not_found
