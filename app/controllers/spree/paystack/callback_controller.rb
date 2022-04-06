@@ -33,6 +33,10 @@ module Spree
         end
       end
 
+      def sanity_check(order)
+        order.can_complete? && order.payment_state.nil?
+      end
+
       def cancel
         order = Spree::Order.find(paystack_params[:order_id])
         hook = SolidusPaystack::Config.callback_hook.new
@@ -42,38 +46,58 @@ module Spree
       private
 
       def valid_transaction?(ref)
-        paystack = SolidusPaystack::PaymentMethod.first
+        paystack = paystack_payment_method
         SolidusPaystack::Gateway.new({ private_api_key: paystack.preferred_private_api_key}).verify_transaction(ref)
       end
 
       def complete_order(order)
-        order.complete if order.can_complete?
+        if sanity_check(order)
+          create_order_payment(order)
+          order.complete!
+        end
       end
 
       def process_order(order, checkout_token, transaction_id)
         if order.payment_state == 'balance_due'
-          payment_method = SolidusPaystack::PaymentMethod.first
-          paystack_source_transaction = SolidusPaystack::Transaction.new(
-            transaction_id: transaction_id,
-            checkout_token: checkout_token,
-            provider: 'paystack'
-          )
+          payment_method = paystack_payment_method
+          paystack_source_transaction = create_paystack_transaction(checkout_token, transaction_id)
 
           paystack_source_transaction.transaction do
             if paystack_source_transaction.save!
               paystack_payment = order.payments.where(payment_method_id: payment_method.id).first
-              paystack_payment&.update!(
-                payment_method_id: payment_method.id,
-                source: paystack_source_transaction,
-                amount: order.total,
-                state: 'completed'
-              )
+              update_order_payment(paystack_payment, payment_method.id, paystack_source_transaction, order)
               order.payment_total = order.total
               order.save!
               head :ok
             end
           end
         end
+      end
+
+      def create_paystack_transaction(checkout_token, transaction_id)
+          SolidusPaystack::Transaction.new(
+            transaction_id: transaction_id,
+            checkout_token: checkout_token,
+            provider: 'paystack'
+          )
+      end
+
+      def create_order_payment(order)
+        payment_method = paystack_payment_method
+        order.payments.create(payment_method_id: payment_method.id)
+      end
+
+      def paystack_payment_method
+        SolidusPaystack::PaymentMethod.first
+      end
+
+      def update_order_payment(paystack_payment, payment_method_id, source_transaction, order)
+        paystack_payment&.update!(
+          payment_method_id: payment_method_id,
+          source: source_transaction,
+          amount: order.total,
+          state: 'completed'
+        )
       end
 
       def paystack_params
