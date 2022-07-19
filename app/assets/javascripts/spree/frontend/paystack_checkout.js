@@ -1,3 +1,4 @@
+
 $( document ).ready(function() {
     $('#checkout_form_payment').submit(function () {
         const checkedPaymentMethod = $('#payment-method-fields input[type="radio"]:checked').val();
@@ -17,28 +18,45 @@ function payNowWithPaystack(event){
     const email = $("#paystack_checkout_payload").data("billing_email");
     const currency = $("#paystack_checkout_payload").data("currency");
     const orderIdWithTimestamp = currentOrder + "_" + Date.now();
-    payWithPaystack(event, orderIdWithTimestamp, orderTotal, email, currency);
+    payWithPaystack(event, orderTotal, email, currency, orderIdWithTimestamp)
 }
 
-function payWithPaystack(event, orderId, amount, email, currency) {
+function payWithPaystack(event, amount, email,  currency, orderIdWithTimestamp){
     event.preventDefault();
-    const secret = $("#paystack_checkout_payload").data("secret");
     const amount_kobo = String(amount) * 100
     const amount_kobo_int = parseInt(amount_kobo);
-    let handler = PaystackPop.setup({
-        key: secret,
-        email: email,
-        currency:currency,
-        amount: amount_kobo_int,
-        ref: orderId,
-        onClose: function(){
-            const button = $('input[type="submit"][name="commit"]')
-            button.disabled = true
-            location.reload();
-        },
-        callback: function() {
-            $('#checkout_form_payment').submit();
+    const url = "https://api.paystack.co/transaction/initialize";
+    const xhttp = new XMLHttpRequest();
+    const secret = $("#paystack_checkout_payload").data("secret");
+
+    const postObj = {
+        "email": email,
+        "amount": amount_kobo_int,
+        "currency":currency,
+        "reference": orderIdWithTimestamp
+    }
+
+    let post = JSON.stringify(postObj)
+    xhttp.open("POST", url, true);
+    xhttp.setRequestHeader('Content-type', 'application/json');
+    xhttp.setRequestHeader('Authorization', 'Bearer '+ secret);
+    xhttp.onreadystatechange = function() {
+        if(this.readyState === 4 && this.status === 200) {
+            const jsonResponse = JSON.parse(this.responseText);
+            const paystack = new PaystackPop();
+            const ref = jsonResponse["data"]["access_code"]
+            const paystackPop = paystack.resumeTransaction(ref);
+
+            paystackPop.onSuccess = function () {
+                $('#checkout_form_payment').submit();
+            }
+
+            paystackPop.onCancel = function () {
+                const button = $('input[type="submit"][name="commit"]')
+                button.disabled = true
+                location.reload();
+            };
         }
-    });
-    handler.openIframe();
+    };
+    xhttp.send(post);
 }
